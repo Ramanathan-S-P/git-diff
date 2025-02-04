@@ -9,11 +9,6 @@ app = Flask(__name__)
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # GitHub API base URL
-GITHUB_API_URL = "https://api.github.com"
-import requests
-from flask import Flask, jsonify, request
-
-app = Flask(__name__)
 
 GITHUB_API_URL = "https://api.github.com"
 @app.route("/repositories/<owner>/<repository>/commits/<oid>", methods=["GET"])
