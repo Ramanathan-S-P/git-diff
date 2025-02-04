@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Diff Viewer</title>
+
+    <!-- Diff2Html CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #diff-container {
+            margin: 20px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GitHub Diff Viewer</h1>
+
+    <form id="diff-form">
+        <label for="owner">Repository Owner:</label>
+        <input type="text" id="owner" name="owner" placeholder="e.g., Ramanathan-S-P" required><br>
+
+        <label for="repo">Repository Name:</label>
+        <input type="text" id="repo" name="repo" placeholder="e.g., LeetCode" required><br>
+
+        <label for="oid">Commit OID:</label>
+        <input type="text" id="oid" name="oid" placeholder="e.g., commit hash" required><br>
+
+        <button type="submit">Get Diff</button>
+    </form>
+
+    <div id="diff-container"></div>
+    <div id="error-message" class="error"></div>
+
+    <!-- Diff2Html JS -->
+    <script src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html.min.js"></script>
+
+    <script>
+        document.getElementById('diff-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const owner = document.getElementById('owner').value;
+            const repo = document.getElementById('repo').value;
+            const oid = document.getElementById('oid').value;
+            const diffContainer = document.getElementById('diff-container');
+            const errorMessage = document.getElementById('error-message');
+
+            // Clear previous results
+            diffContainer.innerHTML = '';
+            errorMessage.textContent = '';
+
+            // Fetch the diff from the Flask backend
+            fetch(`/repositories/${owner}/${repo}/commits/${oid}/diff`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.diff) {
+                        // Use Diff2Html to format the diff and display it
+                        const diffHtml = Diff2Html.html(data.diff, {
+                            drawFileList: true,
+                            matching: 'lines',
+                            outputFormat: 'side-by-side'
+                        });
+                        diffContainer.innerHTML = diffHtml;
+                    } else if (data.error) {
+                        errorMessage.textContent = data.error;
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = `Error: ${error}`;
+                });
+        });
+    </script>
+
+</body>
+</html>

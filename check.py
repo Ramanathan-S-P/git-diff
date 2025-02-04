@@ -22,6 +22,7 @@ def get_commit_details(owner, repository, oid):
         headers = {}
         if GITHUB_TOKEN:
             headers['Authorization'] = f'token {GITHUB_TOKEN}'
+            
 
         # Get the commit data for the specified commit SHA
         commit_url = f"{GITHUB_API_URL}/repos/{owner}/{repository}/commits/{oid}"
